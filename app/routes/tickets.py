@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 from app.models import Ticket, TicketHistory, Comment, User
 from app.forms import TicketForm, EditTicketForm, CommentForm
@@ -183,7 +183,7 @@ def edit(ticket_id):
                                 Ticket.STATUS_LABELS.get(form.status.data, form.status.data)))
                 ticket.status = form.status.data
                 if form.status.data == 'fechado':
-                    ticket.closed_at = datetime.utcnow()
+                    ticket.closed_at = datetime.now(timezone.utc)
                 elif old_status == 'fechado':
                     ticket.closed_at = None
 
@@ -195,7 +195,7 @@ def edit(ticket_id):
             changes.append(('responsavel', old_name, new_name))
             ticket.assignee_id = new_assignee_id
 
-        ticket.updated_at = datetime.utcnow()
+        ticket.updated_at = datetime.now(timezone.utc)
 
         for field, old_val, new_val in changes:
             history = TicketHistory(
@@ -238,7 +238,7 @@ def assign(ticket_id):
     new_name = new_assignee.username if new_assignee else 'Nenhum'
 
     ticket.assignee_id = new_assignee.id if new_assignee else None
-    ticket.updated_at = datetime.utcnow()
+    ticket.updated_at = datetime.now(timezone.utc)
 
     history = TicketHistory(
         ticket_id=ticket.id,
@@ -277,10 +277,10 @@ def change_status(ticket_id):
     old_label = ticket.status_label()
     old_status = ticket.status
     ticket.status = new_status
-    ticket.updated_at = datetime.utcnow()
+    ticket.updated_at = datetime.now(timezone.utc)
 
     if new_status == 'fechado':
-        ticket.closed_at = datetime.utcnow()
+        ticket.closed_at = datetime.now(timezone.utc)
     elif old_status == 'fechado':
         ticket.closed_at = None
 

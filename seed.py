@@ -4,7 +4,7 @@ Execute: python seed.py
 """
 from app import create_app, db
 from app.models import User, Ticket, TicketHistory, Comment
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
 
 app = create_app()
@@ -141,7 +141,7 @@ with app.app_context():
     ]
 
     created_tickets = []
-    base_date = datetime.utcnow() - timedelta(days=30)
+    base_date = datetime.now(timezone.utc) - timedelta(days=30)
 
     for i, data in enumerate(tickets_data):
         t = Ticket(
